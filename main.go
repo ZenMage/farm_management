@@ -1,21 +1,39 @@
 package main
 
+//package imports
 import (
 	"fmt"
 	"io/ioutil"
 	)
 
+//page structure
 type Page struct {
     Title string
     Body  []byte
 }
 
+//page save
 func (p *Page) save() error {
     filename := p.Title + ".txt"
     return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
+//page load
+func loadPage(title string) (*Page, error) {
+    filename := title + ".txt"
+    body, err := ioutil.ReadFile(filename)
+    if err != nil {
+        return nil, err
+    }
+    return &Page{Title: title, Body: body}, nil
+}
+
+
+//main function 
 func main() {
-	fmt.Printf("Farm Management.\n")
+	p1 := &Page{Title: "TestPage", Body: []byte("This is a sample Page.")}
+    p1.save()
+    p2, _ := loadPage("TestPage")
+    fmt.Println(string(p2.Body))
 }
  
