@@ -4,24 +4,29 @@
 
 package main
 
+// imported packages
 import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
 )
 
+// variables
 var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
 
+// page struct
 type Page struct {
 	Title string
 	Body  []byte
 }
 
+// build page
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
+// load page
 func loadPage(title string) (*Page, error) {
 	filename := title + ".txt"
 	body, err := ioutil.ReadFile(filename)
@@ -31,6 +36,7 @@ func loadPage(title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
+// render
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
     err := templates.ExecuteTemplate(w, tmpl+".html", p)
     if err != nil {
@@ -38,6 +44,7 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
     }
 }
 
+// view
 func viewHandler(w http.ResponseWriter, r *http.Request) {
     title := r.URL.Path[len("/view/"):]
     p, err := loadPage(title)
@@ -48,6 +55,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
     renderTemplate(w, "view", p)
 }
 
+// edit
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/edit/"):]
 	p, err := loadPage(title)
@@ -57,6 +65,7 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	renderTemplate(w, "edit", p)
 }
 
+// save
 func saveHandler(w http.ResponseWriter, r *http.Request) {
     title := r.URL.Path[len("/save/"):]
     body := r.FormValue("body")
@@ -69,6 +78,7 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
     http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
+// Main function
 func main() {
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
