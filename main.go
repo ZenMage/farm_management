@@ -19,7 +19,7 @@ var linkRegexp = regexp.MustCompile("\\[([a-zA-Z0-9]+)\\]")
 type Page struct {
 	Title string
 	Body  []byte
-	DisplayBody template.html
+	DisplayBody template.HTML
 }
 
 // functions
