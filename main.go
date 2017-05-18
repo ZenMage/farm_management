@@ -29,7 +29,7 @@ func (p *Page) save() error {
 }
 
 func loadPage(title string) (*Page, error) {
-	filename := title + ".txt"
+	filename := "data/" + title + ".txt"
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -47,6 +47,13 @@ func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
+	escapedBody := []byte(template.HTMLEscapeString(string(p.Body)))
+
+  	p.DisplayBody = template.HTML(linkRegexp.ReplaceAllFunc(escapedBody, func(str []byte) []byte {
+      matched := linkRegexp.FindStringSubmatch(string(str))
+      out := []byte("<a href=\"/view/"+matched[1]+"\">"+matched[1]+"</a>")
+      return out
+    }))
 	renderTemplate(w, "view", p)
 }
 
